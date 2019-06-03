@@ -1,0 +1,16 @@
+syntax = "proto3";
+package contracts;
+import "google/protobuf/timestamp.proto";
+
+message Message {
+  Payload payload = 1;
+  Header header = 2;
+}
+
+message Header {
+  google.protobuf.Timestamp timestamp = 1;
+}
+
+message Payload {
+  string Body = 1;
+}

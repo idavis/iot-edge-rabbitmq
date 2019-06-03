@@ -1,0 +1,17 @@
+FROM microsoft/dotnet:2.1-sdk AS build-env
+WORKDIR /app
+
+COPY /analyzer /analyzer
+COPY /rabbitapi /rabbitapi
+RUN dotnet restore /rabbitapi/rabbitapi.csproj
+RUN dotnet restore /analyzer/analyzer.csproj
+RUN dotnet publish /analyzer/analyzer.csproj -c Release -o /app/out
+
+FROM microsoft/dotnet:2.1-runtime-stretch-slim-arm32v7
+WORKDIR /app
+COPY --from=build-env /app/out ./
+
+RUN useradd -ms /bin/bash moduleuser
+USER moduleuser
+
+ENTRYPOINT ["dotnet", "analyzer.dll"]

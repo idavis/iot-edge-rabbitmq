@@ -1,0 +1,146 @@
+{
+  "$schema-template": "1.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {}
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "rabbit": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "rabbitmq:3.7.12",
+              "createOptions": {
+                "Hostname": "$RABBITMQ_CONTAINER_HOST",
+                "Env": [
+                  "RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER",
+                  "RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS",
+                  "RABBITMQ_HOSTNAME=$RABBITMQ_HOSTNAME"
+                ],
+                "HostConfig": {
+                  "PortBindings": {
+                    "5672/tcp": [
+                      {
+                        "HostPort": "5672"
+                      }
+                    ]
+                  },
+                  "Binds": [
+                    "$RABBITMQ_DATA_DIR:/var/lib/rabbitmq/mnesia"
+                  ]
+                }
+              }
+            }
+          },
+          "producer": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.producer}",
+              "createOptions": {
+                "Env": [
+                  "RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER",
+                  "RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS",
+                  "RABBITMQ_HOSTNAME=$RABBITMQ_HOSTNAME"
+                ]
+              }
+            }
+          },
+          "analyzer": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.analyzer}",
+              "createOptions": {
+                "Env": [
+                  "RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER",
+                  "RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS",
+                  "RABBITMQ_HOSTNAME=$RABBITMQ_HOSTNAME"
+                ]
+              }
+            }
+          },
+          "consumer": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.consumer}",
+              "createOptions": {
+                "Env": [
+                  "RABBITMQ_DEFAULT_USER=$RABBITMQ_DEFAULT_USER",
+                  "RABBITMQ_DEFAULT_PASS=$RABBITMQ_DEFAULT_PASS",
+                  "RABBITMQ_HOSTNAME=$RABBITMQ_HOSTNAME"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "consumerToIoTHub": "FROM /messages/modules/consumer/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
