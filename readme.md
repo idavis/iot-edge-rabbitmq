@@ -1,8 +1,8 @@
 # Azure IoT Edge & RabbitMQ
 
-The Azure IoT Edge EdgeHub Module provides a persistent queue for inter-Module messaging and Edge to IoT Hub messaging.  However, the EdgeHub queue does not currently support a priority level message delivery, or ability to read several messages concurrently from an input.
+The Azure IoT Edge EdgeHub Module provides a persistent queue for inter-Module messaging and Edge to IoT Hub messaging. Starting in 1.0.10, the EdgeHub supports prioritized delivery via [declared route endpoint priorities](https://docs.microsoft.com/en-us/azure/iot-edge/module-composition?view=iotedge-2018-06#declare-routes). This update still doesn't allow for other messaging scenarios where packages like RabbitMQ shine.
 
-For scenarios where priority messaging is required, RabbitMQ can be used in Azure IoT Edge deployments. RabbitMQ may also be a good choice due to its other options.  For example, RabbitMQ supports both transient (in-memory) queues as well as persistent queues. As shown in this sample, persistent queues can be stored on the Edge host machine, and accessed individually by Edge modules.  
+For these other scenarios (as well as message prioritization), RabbitMQ can be used in Azure IoT Edge deployments. RabbitMQ may also be a good choice due to its other options.  For example, RabbitMQ supports both transient (in-memory) queues as well as persistent queues. As shown in this sample, persistent queues can be stored on the Edge host machine, and accessed individually by Edge modules.  
 
 By itself RabbitMQ can only provide priority messaging between Edge modules. Azure IoT Hub also does not support priority queuing.  However, by combining RabbitMQ in an EdgeModule with a separate DeviceClient connection in the module, it is possible to implement a single high-priority message channel to IoT Hub, that bypasses the ModuleClient queue.
 
