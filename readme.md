@@ -59,9 +59,19 @@ In order to set up a multi-reader persistent/durable queue, [RabbitMQ](https://w
 
 https://hub.docker.com/_/rabbitmq
 
-In order to run the sample, several environment variables are required.  For developmment, these can be set in the .env file.  There is a sample .env.temp provided.
+In order to run the sample, several environment variables are required.  For developmment, these can be set in the `.env` file.  There is a sample `.env.temp` provided (along with minimal `.env.min.temp`).
 
 Be sure to follow the [production checklist](http://www.rabbitmq.com/production-checklist.html) when deploying beyond dev.
+
+ In order to fully persist storage, deployments should bind the RabbitMQ `/var/lib/rabbitmq/mnesia` folder to the host. This is not configured in the sample, but below is an example for the deployment config:
+
+```json
+"HostConfig": {
+  "Binds": [
+    "$RABBITMQ_DATA_DIR:/var/lib/rabbitmq/mnesia"
+  ]
+}
+```
 
 #### Built-in RabbbitMQ environment variables
 
@@ -82,18 +92,6 @@ If transport encryption is required, SSL configuration, without the management p
 See the [RabbitMQ documentation on SSL](http://www.rabbitmq.com/ssl.html) for more information.
 
 #### Custom environment variables for configuring on edge
-
-##### RABBITMQ_DATA_DIR
-
-Where to store our persistent/durable queue messages.  This needs to be a path on the container host OS and must exist prior to running the module.  For example, the following could used on Linux:
-
-`RABBITMQ_DATA_DIR=/mnt/data/rabbit`
-
-On Windows, the following could be used:
-
-`RABBITMQ_DATA_DIR="C:\\ProgramData\\rabbit"`
-
-Name for the host. RabbitMQ creates a queue based on the host name. If this isn't set or is changed, the saved messages will no longer be available.
 
 ##### RABBITMQ_CONTAINER_HOST
 

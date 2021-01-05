@@ -57,7 +57,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "rabbitmq:3.7.12",
+              "image": "rabbitmq:3.8",
               "createOptions": {
                 "Hostname": "$RABBITMQ_CONTAINER_HOST",
                 "Env": [
@@ -72,10 +72,7 @@
                         "HostPort": "5672"
                       }
                     ]
-                  },
-                  "Binds": [
-                    "$RABBITMQ_DATA_DIR:/var/lib/rabbitmq/mnesia"
-                  ]
+                  }
                 }
               }
             }
